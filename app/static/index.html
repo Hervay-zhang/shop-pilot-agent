@@ -1,0 +1,149 @@
+<!doctype html>
+<!-- Interface review adapted from Unslop by Damir Sokolovsky (CC BY 4.0). https://github.com/heydamir/unslop -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f4f5f7">
+  <title>ShopPilot 工作台</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/styles.css?v=workbench-20261124">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">SP</span><strong>ShopPilot</strong></div>
+      <nav class="main-nav" aria-label="工作台">
+        <button class="nav-item active" data-view="buyer" aria-current="page">买家工作台</button>
+        <button class="nav-item" data-view="merchant">商家工作台</button>
+      </nav>
+      <div class="top-actions">
+        <button class="ghost-button" id="tools-button">工具清单</button>
+        <a class="docs-link" href="/docs" target="_blank" rel="noreferrer">API 文档 <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="view active" id="buyer-view" aria-labelledby="buyer-title">
+      <header class="page-heading">
+        <div><h1 id="buyer-title">采购清单</h1><p>输入预算和商品要求，查看可选商品与优惠明细。</p></div>
+        <div class="env-pill" id="runtime-pill" role="status"><i></i><span>正在连接</span></div>
+      </header>
+
+      <div class="buyer-workbench">
+        <article class="panel chat-panel">
+          <header class="panel-heading"><h2>购物需求</h2></header>
+          <div class="messages" id="messages" aria-live="polite">
+            <div class="message assistant">
+              <span class="avatar" aria-hidden="true">SP</span>
+              <div class="bubble"><p>你想买什么？可以加上尺寸、收货要求和总预算。</p></div>
+            </div>
+          </div>
+          <footer class="chat-footer">
+            <div class="scenario-row" aria-label="示例需求">
+              <span>试填</span>
+              <button class="scenario-chip" data-prompt="预算 800 元，买一个 16 寸电脑通勤包和防晒霜，上海发货">800 元通勤组合</button>
+              <button class="scenario-chip" data-prompt="预算 600 元，准备通勤用的降噪耳机和轻量电脑包">600 元数码组合</button>
+              <button class="scenario-chip" data-prompt="直接执行退款">测试安全拦截</button>
+            </div>
+            <form class="composer" id="buyer-form">
+              <label class="sr-only" for="buyer-input">购物需求</label>
+              <textarea id="buyer-input" maxlength="500" rows="3" placeholder="例如：800 元内买 16 寸电脑包和防晒霜，希望从上海发货"></textarea>
+              <div class="composer-actions"><span>Shift + Enter 换行</span><button class="primary-button" id="send-button" type="submit">查找商品 <span aria-hidden="true">→</span></button></div>
+            </form>
+          </footer>
+        </article>
+        <article class="panel result-panel" id="result-panel">
+          <header class="panel-heading"><h2>订单草稿</h2><span>人民币 CNY</span></header>
+          <div id="empty-result" class="empty-result">
+            <div class="empty-receipt">
+              <div><span>商品小计</span><span>—</span></div>
+              <div><span>会员优惠</span><span>—</span></div>
+              <div><span>优惠券</span><span>—</span></div>
+              <div class="receipt-total"><strong>应付金额</strong><strong>—</strong></div>
+            </div>
+            <p>填写需求后，这里会列出商品、优惠和应付金额。</p>
+          </div>
+          <div class="result-content hidden" id="result-content"></div>
+        </article>
+      </div>
+      <section class="panel run-panel" aria-labelledby="run-title">
+        <header class="panel-heading"><h2 id="run-title">处理记录</h2></header>
+        <div class="run-strip" id="run-strip" aria-label="执行进度">
+          <div class="run-step" data-step="guard"><strong>安全检查</strong><small>等待任务</small></div>
+          <div class="run-step" data-step="understand"><strong>解析需求</strong><small>等待任务</small></div>
+          <div class="run-step" data-step="retrieve"><strong>匹配商品</strong><small>等待任务</small></div>
+          <div class="run-step" data-step="price"><strong>计算优惠</strong><small>等待任务</small></div>
+          <div class="run-step" data-step="validate"><strong>库存与价格校验</strong><small>等待任务</small></div>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" id="merchant-view" aria-labelledby="merchant-title">
+      <header class="page-heading">
+        <div><h1 id="merchant-title">经营概览</h1><p>近 7 日经营数据 <span class="period-divider">/</span> 演示店铺</p></div>
+        <button class="secondary-button" id="refresh-merchant">刷新数据</button>
+      </header>
+      <div class="kpi-grid" id="kpi-grid" aria-label="经营指标">
+        <div class="kpi-placeholder">正在读取指标</div>
+      </div>
+
+      <div class="merchant-grid">
+        <article class="panel diagnosis-panel">
+          <header class="panel-heading"><h2>转化漏斗</h2><span>近 7 日 · 各环节量级</span></header>
+          <div class="diagnosis-note" id="diagnosis-note" role="status"></div>
+          <div class="funnel" id="funnel"></div>
+          <details class="report-details">
+            <summary>数据口径与生成时间</summary>
+            <p id="merchant-headline">正在读取经营数据…</p>
+            <p>语义层 <span id="semantic-version">—</span> <span class="period-divider">/</span> 生成时间 <span id="report-time">—</span></p>
+          </details>
+        </article>
+
+        <article class="panel action-panel">
+          <header class="panel-heading"><h2>新建调价单</h2></header>
+          <form id="change-form" class="change-form">
+            <label><span>商品 SKU</span><select id="change-sku">
+              <option value="BAG-16-GRY">雾灰通勤包 · BAG-16-GRY</option>
+              <option value="BAG-16-BLK">曜石黑通勤包 · BAG-16-BLK</option>
+              <option value="SUN-50-MLD">SPF50+ 防晒 · SUN-50-MLD</option>
+            </select></label>
+            <label><span>新价格（元）</span><input id="change-price" type="number" required min="1" step="0.01" value="299"></label>
+            <p>提交后生成变更单并估算影响。超过阈值的调价进入审批。</p>
+            <button class="primary-button" type="submit">提交调价单</button>
+          </form>
+          <div class="proposal-result hidden" id="proposal-result" role="status"></div>
+        </article>
+      </div>
+      <div class="merchant-lower">
+        <article class="panel changes-panel">
+          <header class="panel-heading"><h2>变更台账</h2><span>审批、执行与回滚</span></header>
+          <div class="change-list" id="change-list"></div>
+        </article>
+        <article class="panel experiment-panel">
+          <header class="panel-heading"><h2>实验回测</h2><span>支付转化率</span></header>
+          <div id="experiment-content"></div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <footer class="page-footer"><span>ShopPilot</span><span>演示环境</span></footer>
+</div>
+
+<div class="modal" id="tools-modal" role="dialog" aria-modal="true" aria-labelledby="tools-title" aria-hidden="true">
+  <div class="modal-backdrop" data-close-modal></div>
+  <div class="modal-card" tabindex="-1">
+    <header class="modal-header">
+      <h2 id="tools-title">MCP 工具清单</h2>
+      <button class="secondary-button close-button" id="tools-close" data-close-modal aria-label="关闭工具清单">关闭</button>
+    </header>
+    <div class="tool-grid" id="tool-grid"></div>
+  </div>
+</div>
+<div class="toast-stack" id="toast-stack" role="status" aria-live="polite"></div>
+<script src="/static/app.js?v=workbench-20261124" defer></script>
+</body>
+</html>

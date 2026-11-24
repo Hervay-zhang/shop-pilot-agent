@@ -1,0 +1,12 @@
+fastapi==0.121.2
+uvicorn[standard]==0.40.0
+SQLAlchemy==2.0.51
+PyMySQL==1.1.2
+pydantic==2.13.4
+PyJWT==2.10.1
+httpx==0.28.1
+redis==6.4.0
+qdrant-client==1.15.1
+langgraph==1.0.4
+fastmcp==2.12.5
+python-dotenv==1.2.1

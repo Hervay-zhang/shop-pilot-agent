@@ -1,0 +1,17 @@
+[project]
+name = "shop-pilot-agent"
+version = "0.1.0"
+description = "A compact, production-minded ecommerce Agent demo for buyers and merchants."
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008"]
